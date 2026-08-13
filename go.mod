@@ -1,4 +1,4 @@
-module github.com/tamper000/tor-scanner
+module github.com/KMusorin/tor-scanner
 
 go 1.25.4
 
