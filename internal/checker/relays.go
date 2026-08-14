@@ -2,6 +2,7 @@ package checker
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 	"os"
@@ -45,7 +46,9 @@ func GetBridges(input, bridgeType string) ([]Relays, error) {
 
 	if bridgeType == "" {
 		var info RelaysInfo
-		json.Unmarshal(data, &info)
+		if err := json.Unmarshal(data, &info); err != nil {
+			return nil, fmt.Errorf("parsing JSON input: %w", err)
+		}
 		return info.Relays, nil
 	}
 

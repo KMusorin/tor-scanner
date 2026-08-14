@@ -115,7 +115,7 @@ func start() error {
 		list = append(list, addr)
 		label := fmt.Sprintf("%dms", addr.Ping.Milliseconds())
 		if addr.Country != "" {
-			label = strings.Title(addr.Country) + " " + label
+			label = strings.ToUpper(addr.Country) + " " + label
 		}
 		fmt.Println(aurora.Green("Found"), aurora.Cyan(addr.OrAddresses[0]), aurora.Blue("- "+label))
 	}

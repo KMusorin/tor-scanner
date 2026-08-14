@@ -28,7 +28,7 @@ func Check(ctx context.Context, alive chan Relays, relays []Relays, timeout time
 		default:
 			if countries[0] != "" {
 				if relay.Country == "" {
-					relay.Country = relayCountry(relay)
+					relay.Country = relayCountry(ctx, relay)
 				}
 				if !slices.Contains(countries, relay.Country) {
 					continue
@@ -50,7 +50,7 @@ func Check(ctx context.Context, alive chan Relays, relays []Relays, timeout time
 	}
 }
 
-func relayCountry(relay Relays) string {
+func relayCountry(ctx context.Context, relay Relays) string {
 	if relay.Country != "" {
 		return relay.Country
 	}
@@ -64,13 +64,13 @@ func relayCountry(relay Relays) string {
 		return cached.(string)
 	}
 
-	country := lookupPTR(host)
+	country := lookupPTR(ctx, host)
 	countryCache.Store(host, country)
 	return country
 }
 
-func lookupCountry(host string) string {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second*2)
+func lookupCountry(ctx context.Context, host string) string {
+	ctx, cancel := context.WithTimeout(ctx, time.Second*2)
 	defer cancel()
 
 	names, err := (&net.Resolver{}).LookupAddr(ctx, host)

@@ -3,6 +3,7 @@ package checker
 import (
 	"context"
 	"net"
+	"sync"
 	"testing"
 	"time"
 )
@@ -106,14 +107,14 @@ func TestCheckMeasuresPing(t *testing.T) {
 
 func TestCheckFiltersByCountryBeforeDial(t *testing.T) {
 	original := lookupPTR
-	defer func() { lookupPTR = original }()
-
-	lookupPTR = func(host string) string {
+	lookupPTR = func(ctx context.Context, host string) string {
 		if host == "203.0.113.1" {
 			return "de"
 		}
 		return "ru"
 	}
+	countryCache = sync.Map{}
+	defer func() { lookupPTR = original }()
 
 	ln, err := net.Listen("tcp", "127.0.0.1:0")
 	if err != nil {
