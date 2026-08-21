@@ -93,7 +93,7 @@ func TestCheckMeasuresPing(t *testing.T) {
 		}
 	}()
 
-	Check(ctx, alive, relays, time.Second, "")
+	Check(ctx, alive, relays, time.Second, "", false)
 
 	select {
 	case r := <-alive:
@@ -144,7 +144,7 @@ func TestCheckFiltersByCountryBeforeDial(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*2)
 	defer cancel()
 
-	Check(ctx, alive, relays, time.Second, "ru")
+	Check(ctx, alive, relays, time.Second, "ru", false)
 
 	select {
 	case r := <-alive:
@@ -165,5 +165,49 @@ func TestCheckFiltersByCountryBeforeDial(t *testing.T) {
 	case <-accepted:
 		t.Fatal("dialed a relay that does not match --country")
 	case <-time.After(300 * time.Millisecond):
+	}
+}
+
+func TestCheckForcedCountryLookup(t *testing.T) {
+	original := lookupPTR
+	lookupPTR = func(ctx context.Context, host string) string {
+		return "de"
+	}
+	countryCache = sync.Map{}
+	defer func() { lookupPTR = original }()
+
+	ln, err := net.Listen("tcp", "127.0.0.1:0")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer ln.Close()
+
+	go func() {
+		for {
+			conn, err := ln.Accept()
+			if err != nil {
+				return
+			}
+			conn.Close()
+		}
+	}()
+
+	relays := []Relays{
+		{OrAddresses: []string{ln.Addr().String()}},
+	}
+	alive := make(chan Relays, 1)
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*2)
+	defer cancel()
+
+	Check(ctx, alive, relays, time.Second, "", true)
+
+	select {
+	case r := <-alive:
+		if r.Country != "de" {
+			t.Fatalf("expected forced lookup to set country, got %q", r.Country)
+		}
+	case <-time.After(time.Second * 2):
+		t.Fatal("relay not received")
 	}
 }

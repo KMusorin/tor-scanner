@@ -14,8 +14,9 @@ var (
 	lookupPTR    = lookupCountry
 )
 
-func Check(ctx context.Context, alive chan Relays, relays []Relays, timeout time.Duration, country string) {
+func Check(ctx context.Context, alive chan Relays, relays []Relays, timeout time.Duration, country string, forceLookup bool) {
 	countries := strings.Split(country, ",")
+	needFilter := countries[0] != ""
 
 	dialer := &net.Dialer{
 		Timeout: timeout,
@@ -26,13 +27,13 @@ func Check(ctx context.Context, alive chan Relays, relays []Relays, timeout time
 		case <-ctx.Done():
 			return
 		default:
-			if countries[0] != "" {
+			if needFilter || forceLookup {
 				if relay.Country == "" {
 					relay.Country = relayCountry(ctx, relay)
 				}
-				if !slices.Contains(countries, relay.Country) {
-					continue
-				}
+			}
+			if needFilter && !slices.Contains(countries, relay.Country) {
+				continue
 			}
 			start := time.Now()
 			conn, err := dialer.Dial("tcp", relay.OrAddresses[0])

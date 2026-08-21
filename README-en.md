@@ -36,6 +36,7 @@ tor-scanner \
 | `--threads` | Number of concurrent requests (default: 50) — higher values mean faster scanning |
 | `--ping` | Maximum delay (in milliseconds) for a bridge to be considered responsive (default: 250) |
 | `--country` | Filter bridges by country codes. Example: `ru,es,us` — checks only bridges from these countries. For obfs4 the country is resolved via reverse DNS, so IPs without a PTR record won't match |
+| `--lookup-country` | Force reverse-DNS country lookup for bridges whose source provides no country (e.g., obfs4). The country code is printed next to each found bridge in the console. Without `--country` nothing is filtered out. Note: a PTR request is made for every unique IP without country data (2 s timeout), which slows down scanning; IPs without a PTR record stay without a country code |
 | `--output` | File to save found bridges (e.g., `tor.conf`) |
 | `--input` | URL or path to a file containing a list of bridges. If omitted, the source is chosen automatically by `--type`: vanilla — tor-onionoo-mirror, obfs4 — `bridges-obfs4` |
 | `--type` | Bridge type: `obfs4` — use the obfs4 bridge list; empty value (default) — regular relays (vanilla) |

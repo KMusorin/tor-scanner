@@ -19,10 +19,11 @@ var (
 	threads = 50
 	maxPing = 250
 
-	output     = ""
-	input      = ""
-	bridgeType = ""
-	country    = ""
+	output        = ""
+	input         = ""
+	bridgeType    = ""
+	country       = ""
+	lookupCountry = false
 
 	list = []checker.Relays{}
 )
@@ -39,6 +40,7 @@ func main() {
 	cli.IntFlag("threads", "How many threads are needed", &threads)
 	cli.IntFlag("ping", "Maximum Delay to Relay in ms", &maxPing)
 	cli.StringFlag("country", "Including countries. EX: ru,es,us", &country)
+	cli.BoolFlag("lookup-country", "Force reverse-DNS country lookup for relays without country data", &lookupCountry)
 	cli.StringFlag("output", "File to save", &output)
 	cli.StringFlag("input", "You can set where to get bridges from (including the path to the file)", &input)
 	cli.StringFlag("type", "Bridge type (obfs4, etc). Empty for the default relay list", &bridgeType)
@@ -99,7 +101,7 @@ func start() error {
 		wg.Add(1)
 		go func(c []checker.Relays) {
 			defer wg.Done()
-			checker.Check(ctx, alive, c, time.Duration(maxPing)*time.Millisecond, country)
+			checker.Check(ctx, alive, c, time.Duration(maxPing)*time.Millisecond, country, lookupCountry)
 		}(chunk)
 	}
 	go func() {
