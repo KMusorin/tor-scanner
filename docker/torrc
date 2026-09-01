@@ -1,0 +1,9 @@
+DataDirectory /var/lib/tor
+SocksPort 0.0.0.0:9050
+Log notice stdout
+AvoidDiskWrites 1
+HardwareAccel 1
+ReducedConnectionPadding 1
+RunAsDaemon 0
+
+%include /etc/tor/torrc.d/*.conf

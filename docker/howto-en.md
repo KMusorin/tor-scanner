@@ -25,7 +25,25 @@ You can also pass parameters
 docker run -p 9050:9050 --rm -d --name tor-node tor-scanner -count 3 -ping 100 -country us
 ```
 
-Once running, Tor will be available as a SOCKS5 proxy at `localhost:9050`.
+Once running, Tor will be available as a SOCKS5 proxy at `localhost:9050`. The internal Tor port is fixed at `9050`; it is exposed via the `-p <external>:9050` mapping.
+
+### 🔧 Environment variables
+
+| Variable | Description | Default |
+|---|---|---|
+| `EXIT_NODES` | Restrict exit nodes, e.g. `{us},{de}` | unset |
+| `EXCLUDE_EXIT_NODES` | Exclude exit nodes, e.g. `{cn},{ru}` | unset |
+| `STRICT_NODES` | Strict node selection, e.g. `1` | unset |
+| `CLIENT_USE_IPV6` | Use IPv6 for exit nodes, e.g. `1` | unset |
+
+```bash
+docker run -p 9050:9050 --rm -d --name tor-node \
+    -e EXIT_NODES='{us}' \
+    -e STRICT_NODES='1' \
+    tor-scanner -count 3 -ping 100
+```
+
+> ⚙️ `SocksPort` is fixed (`0.0.0.0:9050`) and the `ClientTransportPlugin` for obfs4 (lyrebird) is hard-coded in the included config. To use a different internal port, set it in the second part of `-p`, e.g. `-p 1080:9050`.
 
 ### ✅ Verify the proxy is working:
 

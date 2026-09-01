@@ -1,4 +1,7 @@
+.DS_Store
 demo.tape
 main
 tor-scanner
 tor.conf
+tor-scanner.tar
+tor-scanner.tar.gz
