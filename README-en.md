@@ -6,13 +6,11 @@ It checks bridges for availability and selects only those that respond quickly a
 Two types of sources are supported:
 
 - **Regular relays (vanilla)** — Onionoo list in JSON format (default source).
-- **obfs4 bridges** — line-based list from the [Tor-Bridges-Collector](https://github.com/scriptzteam/Tor-Bridges-Collector).
+- **obfs4 bridges** — line-based list from [Tor-Bridges-Collector](https://github.com/Delta-Kronecker/Tor-Bridges-Collector) or [Tor-Bridges-Collector-v2](https://github.com/scriptzteam/Tor-Bridges-Collector-v2).
 
 Suitable for users living in censored regions who need reliable bridges to connect to Tor.
 
 ---
-
-![Demo](.github/demo.gif)
 
 ## 🚀 How to Use
 
@@ -32,6 +30,7 @@ tor-scanner \
 
 | Parameter | Description |
 |----------|-------------|
+| `--type` | Bridge type: `obfs4` — use the obfs4 bridge list; empty value (default) — regular relays (vanilla) |
 | `--count` | Number of working bridges to find (default: 5) |
 | `--threads` | Number of concurrent requests (default: 50) — higher values mean faster scanning |
 | `--ping` | Maximum delay (in milliseconds) for a bridge to be considered responsive (default: 250) |
@@ -39,7 +38,6 @@ tor-scanner \
 | `--lookup-country` | Force reverse-DNS country lookup for bridges whose source provides no country (e.g., obfs4). The country code is printed next to each found bridge in the console. Without `--country` nothing is filtered out. Note: a PTR request is made for every unique IP without country data (2 s timeout), which slows down scanning; IPs without a PTR record stay without a country code |
 | `--output` | File to save found bridges (e.g., `tor.conf`) |
 | `--input` | URL or path to a file containing a list of bridges. If omitted, the source is chosen automatically by `--type`: vanilla — tor-onionoo-mirror, obfs4 — `bridges-obfs4` |
-| `--type` | Bridge type: `obfs4` — use the obfs4 bridge list; empty value (default) — regular relays (vanilla) |
 
 ---
 
@@ -76,6 +74,14 @@ Country filtering for obfs4 bridges works via reverse DNS (top-level domain): `-
 ```bash
 tor-scanner --type obfs4 --input my-obfs4-bridges.list --count 10 --output tor.conf
 ```
+
+### Find working obfs4 bridges and show their countries:
+
+```bash
+tor-scanner --type obfs4 --count 10 --threads 20 --ping 1000 --lookup-country --output tor.conf
+```
+
+`--lookup-country` resolves each found bridge's country via reverse DNS and prints the country code (e.g., `DE 45ms`) next to the bridge in the console.
 
 ---
 
