@@ -93,7 +93,7 @@ The tool generates a ready-to-use `torrc` config:
 - obfs4: `Bridge obfs4 <ip:port> <fingerprint> cert=... iat-mode=...`
 - ends with `UseBridges 1`
 
-If fewer bridges are found than requested via `--count`, a warning is printed and the found bridges are still saved to the file. If no working bridges are found at all, the tool exits with an error.
+If fewer bridges are found than requested via `--count`, a warning is printed and the found bridges are still saved to the file. If no working bridges are found at all, the tool exits with code `1`. The Docker image uses this for fallback: on a failed scan Tor starts on the previous `bridges.conf`, and if there is none the container is restarted (`restart-policy=always`).
 
 ---
 

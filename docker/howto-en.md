@@ -82,3 +82,14 @@ Nov 16 09:31:18.000 [notice] Bootstrapped 100% (done): Done
 docker stop tor-node
 docker run -p 9050:9050 --rm -d --name tor-node tor-scanner
 ```
+
+---
+
+## ⚠️ If the scan finds no bridges
+
+`tor-scanner` exits with code `1` when a scan yields nothing (for example, the router's network is not ready yet right after boot). In that case `entrypoint.sh` does not abort the startup:
+
+- if `/etc/tor/torrc.d/bridges.conf` already holds a list from a previous run, Tor starts on it (a stale but working list);
+- if the file is missing (very first run), the container exits with code `1` and `restart-policy=always` restarts it (with `restart-interval=1m`, once a minute) until a scan succeeds.
+
+Note: with `root-dir` mounted on persistent storage, `bridges.conf` survives restarts, so the previous list can be used as a fallback.

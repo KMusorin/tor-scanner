@@ -49,6 +49,7 @@ func main() {
 
 	if err := cli.Run(); err != nil {
 		fmt.Printf("Error encountered: %v\n", err)
+		os.Exit(1)
 	}
 }
 

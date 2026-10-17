@@ -5,11 +5,12 @@ CONF_DIR=/etc/tor/torrc.d
 mkdir -p "$CONF_DIR"
 
 echo "Running tor-scanner with user parameters: $@"
-/usr/local/bin/tor-scanner "$@" -output "$CONF_DIR/bridges.conf"
-
-if [ ! -f "$CONF_DIR/bridges.conf" ]; then
-    echo "Failed to generate $CONF_DIR/bridges.conf."
-    exit 1
+if ! /usr/local/bin/tor-scanner "$@" -output "$CONF_DIR/bridges.conf"; then
+    if [ ! -f "$CONF_DIR/bridges.conf" ]; then
+        echo "Failed to generate $CONF_DIR/bridges.conf, no fallback available."
+        exit 1
+    fi
+    echo "tor-scanner failed; falling back to existing $CONF_DIR/bridges.conf"
 fi
 
 {
